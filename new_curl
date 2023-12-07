@@ -1,0 +1,23 @@
+curl 'https://www.instagram.com/api/graphql' \
+  -H 'authority: www.instagram.com' \
+  -H 'accept: */*' \
+  -H 'accept-language: ru-RU,ru;q=0.9' \
+  -H 'content-type: application/x-www-form-urlencoded' \
+  -H 'cookie: csrftoken=KxBv2WNH03JwZdo8gZWE71; mid=ZXIsmQAEAAGUxzE0SXq8Xt9R1sAG; ig_did=FD39D2DC-2696-4BDF-A330-85B3B2C98337; ig_nrcb=1; datr=mSxyZeqF7GH1jjclA2djNOOD; dpr=3' \
+  -H 'dpr: 3' \
+  -H 'origin: https://www.instagram.com' \
+  -H 'referer: https://www.instagram.com/reel/CzMR70XC1C3/' \
+  -H 'sec-ch-prefers-color-scheme: light' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'user-agent: Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1' \
+  -H 'viewport-width: 390' \
+  -H 'x-asbd-id: 129477' \
+  -H 'x-csrftoken: KxBv2WNH03JwZdo8gZWE71' \
+  -H 'x-fb-friendly-name: PolarisPostActionLoadPostQueryQuery' \
+  -H 'x-fb-lsd: AVp8-FMus6c' \
+  -H 'x-ig-app-id: 1217981644879628' \
+  --data-raw 'av=0&__d=www&__user=0&__a=1&__req=3&__hs=19698.HYP%3Ainstagram_web_pkg.2.1..0.0&dpr=2&__ccg=UNKNOWN&__rev=1010272456&__s=5o02yo%3A9d9qeh%3Abvvaqt&__hsi=7309954327711794454&__dyn=7xeUjG1mxu1syUbFp60DU98nwgU29zEdEc8co2qwJw5ux609vCwjE1xoswIwuo2awlU-cw5Mx62G3i1ywOwv89k2C1Fwc60AEC7U2czXwae4UaEW2G1NwwwNwKwHw8Xxm16wUwtEvw4JwJwSyES1Twoob82cwMwrUdUbGwmk1xwmo6O1FwlE6OFA6fxy4Ujw&__csr=goOQyhq6eExVTucCpb-_nKjCjKEzBVaF4yQqmKdhVVpFWAiADzpXK9BgyRBxCh2JqiDKi-swyhpF9lDrgyVbyi38OmaLUNqyqBhUG8CBxe2y2268nw04Kig2TJw1iOEggjw1X6062E4i3FG44U_c0O9E0Sq2Kh0fnc4U5Wi260vQMy0u20uK00GdE&__comet_req=7&lsd=AVp8-FMus6c&jazoest=2896&__spin_r=1010272456&__spin_b=trunk&__spin_t=1701981371&fb_api_caller_class=RelayModern&fb_api_req_friendly_name=PolarisPostActionLoadPostQueryQuery&variables=%7B%22shortcode%22%3A%22CzMR70XC1C3%22%2C%22fetch_comment_count%22%3A40%2C%22fetch_related_profile_media_count%22%3A3%2C%22parent_comment_count%22%3A24%2C%22child_comment_count%22%3A3%2C%22fetch_like_count%22%3A10%2C%22fetch_tagged_user_count%22%3Anull%2C%22fetch_preview_comment_count%22%3A2%2C%22has_threaded_comments%22%3Atrue%2C%22hoisted_comment_id%22%3Anull%2C%22hoisted_reply_id%22%3Anull%7D&server_timestamps=true&doc_id=10015901848480474' \
+  --compressed
+  
