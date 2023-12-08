@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -81,6 +82,10 @@ func (b *Bot) UploadVideo(ctx context.Context, chatID string, videoFile io.Reade
 	defer resp.Body.Close()
 
 	var apiResp APIResponse
+	err = json.NewDecoder(resp.Body).Decode(&apiResp)
+	if err != nil {
+		return fmt.Errorf("failed to decode response: %w", err)
+	}
 
 	if !apiResp.Ok {
 		return fmt.Errorf("api error: %s", apiResp.Description)
