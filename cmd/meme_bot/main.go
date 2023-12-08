@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log/slog"
 	"meme_bot/internal/bot"
 	"meme_bot/internal/handler"
@@ -11,34 +10,40 @@ import (
 )
 
 func main() {
-	port := flag.String("port", "8000", "port number for http listener")
-	token := flag.String("token", "", "bot token")
-	chatID := flag.String("chat_id", "", "")
-	flag.Parse()
+	port := os.Getenv("PORT")
+	token := os.Getenv("TOKEN")
+	chatID := os.Getenv("CHAT_ID")
+	slog.Info("starting app", "port", port, "token", token, "chatID", chatID)
 
-	if *token == "" {
+	if token == "" {
 		slog.Error("token is empty")
 		os.Exit(1)
 	}
-	if *chatID == "" {
+	if chatID == "" {
 		slog.Error("chatID is empty")
 		os.Exit(1)
 	}
+	if port == "" {
+		slog.Error("PORT is empty")
+		os.Exit(1)
+	}
 
-	b := bot.NewBot(*token)
-	h := handler.NewHandler(*chatID, b)
+	b := bot.NewBot(token)
+	h := handler.NewHandler(chatID, b)
 
 	router := http.NewServeMux()
 	router.HandleFunc("/webhook", h.HandleMessage)
 
-	srv := NewServer(*port, router)
+	srv := NewServer(port, router)
 	err := srv.ListenAndServe()
 	if err != nil {
+		slog.Error("cant start server", "error", err)
 		os.Exit(1)
 	}
 }
 
 func NewServer(port string, h http.Handler) *http.Server {
+	slog.Info("starting server", "port", port)
 	address := net.JoinHostPort("0.0.0.0", port)
 
 	srv := &http.Server{
