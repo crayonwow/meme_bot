@@ -1,15 +1,18 @@
-package main
+package instagram
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
-	"flag"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
+
+var ErrEmptyUrl = errors.New("url is empty")
 
 type videoData struct {
 	Data struct {
@@ -300,7 +303,7 @@ func idFromURL(urlStr string) (string, error) {
 	return parts[len(parts)-1], nil
 }
 
-func videoDownloadUrl(_url string) (string, error) {
+func videoDownloadUrl(ctx context.Context, _url string) (string, error) {
 	id, err := idFromURL(_url)
 	if err != nil {
 		return "", fmt.Errorf("id from url: %w", err)
@@ -309,6 +312,7 @@ func videoDownloadUrl(_url string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("new request: %w", err)
 	}
+	req = req.WithContext(ctx)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -336,55 +340,45 @@ func videoDownloadUrl(_url string) (string, error) {
 	return videoUrl, nil
 }
 
-func downloadVideo(_url string) error {
-	req, err := http.NewRequest(http.MethodGet, _url, nil)
+func downloadVideo(ctx context.Context, _url string) (io.Reader, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, _url, nil)
 	if err != nil {
-		return fmt.Errorf("new request: %w", err)
+		return nil, fmt.Errorf("new request: %w", err)
 	}
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("do request: %w", err)
+		return nil, fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("status code: %d", resp.StatusCode)
 	}
 
-	f, err := os.Create("video.mp4")
-	if err != nil {
-		return fmt.Errorf("create file: %w", err)
-	}
-	defer f.Close()
+	f := bytes.NewBuffer([]byte{})
 
 	_, err = io.Copy(f, resp.Body)
 	if err != nil {
-		return fmt.Errorf("copy: %w", err)
+		return nil, fmt.Errorf("copy: %w", err)
 	}
 
-	return nil
+	return f, nil
 }
 
-func main() {
-	instagramUrl := ""
-	flag.StringVar(&instagramUrl, "url", "", "url")
-	flag.Parse()
-
-	if instagramUrl == "" {
-		fmt.Println("url is empty")
-		os.Exit(1)
+// DownloadVideo downloads video from instagram post url
+func DownloadVideo(ctx context.Context, _url string) (io.Reader, error) {
+	if _url == "" {
+		return nil, ErrEmptyUrl
 	}
-	vdu, err := videoDownloadUrl(instagramUrl)
+	videoUrl, err := videoDownloadUrl(ctx, _url)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return nil, fmt.Errorf("video download url: %w", err)
 	}
 
-	err = downloadVideo(vdu)
+	video, err := downloadVideo(ctx, videoUrl)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return nil, fmt.Errorf("download video: %w", err)
 	}
-	fmt.Println("ok")
+	return video, nil
 }
