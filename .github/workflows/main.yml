@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  TAG_NAME: ${{ github.sha }}
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+      - name: Build image
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }} .
+      - name: Tag image:last
+        run: docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push image to GHCR
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     packages: read
+  #   needs: build_and_push
+  #   steps:
+  #     - name: deploy to server via SSH action
+  #       uses: appleboy/ssh-action@v0.1.8
+  #       with:
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         key: ${{ secrets.KEY }}
+  #         port: ${{ secrets.PORT }}
+  #         script: |
+  #           # Login to GHCR
+  #           echo -n ${{ secrets.GITHUB_TOKEN }} | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+  #           # Tag latestold image from latest
+  #           docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latestold
+  #           # Get version ${{ env.TAG_NAME }}
+  #           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG_NAME }}
+  #           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+  #           # Stop container
+  #           docker stop ${{ github.event.repository.name }}
+  #           # docker rm old container ${{ github.event.repository.name }}
+  #           docker rm ${{ github.event.repository.name }}
+  #           # Start container
+  #           docker run -d -v ${{ vars.HOST_DIR }}:${{ vars.OZ_DIR }} --name ${{ github.event.repository.name }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
