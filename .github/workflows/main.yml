@@ -59,4 +59,8 @@ jobs:
             # docker rm old container ${{ github.event.repository.name }}
             docker rm ${{ github.event.repository.name }}
             # Start container
-            docker run -d --name ${{ github.event.repository.name }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker run -d --name ${{ github.event.repository.name }} \
+              -e TOKEN=${{ secrets.BOT_TOKEN }} \
+              -e PORT=${{ secrets.BOT_PORT }} \
+              -e CHAT_ID=${{ secrets.CHAT_ID }} \
+              ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

@@ -11,4 +11,3 @@ RUN chmod +x /build/bot
 FROM scratch
 COPY --from=builder /build/bot /usr/bin/bot
 CMD ["/usr/bin/bot"]
-EXPOSE 8080
