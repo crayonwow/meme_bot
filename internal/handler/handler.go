@@ -12,16 +12,18 @@ import (
 	"net/url"
 )
 
-func NewHandler(chatID string, b *bot.Bot) *Handler {
+func NewHandler(client *instagram.Client, chatID string, b *bot.Bot) *Handler {
 	return &Handler{
 		b:      b,
 		chatID: chatID,
+		insta:  client,
 	}
 }
 
 type Handler struct {
 	b      *bot.Bot
 	chatID string
+	insta  *instagram.Client
 }
 
 func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +53,7 @@ func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) do(ctx context.Context, _url string) error {
-	video, err := instagram.DownloadVideo(ctx, _url)
+	video, err := h.insta.DownloadVideo(ctx, _url)
 	if err != nil {
 		return fmt.Errorf("cant download video: %w", err)
 	}
