@@ -63,4 +63,5 @@ jobs:
               -e TOKEN=${{ secrets.BOT_TOKEN }} \
               -e PORT=${{ secrets.BOT_PORT }} \
               -e CHAT_ID=${{ secrets.CHAT_ID }} \
+              - p ${{ secrets.BOT_PORT }}:${{ secrets.BOT_PORT }}
               ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
