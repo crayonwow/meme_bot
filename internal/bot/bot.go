@@ -8,8 +8,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strings"
-
-	"golang.org/x/time/rate"
 )
 
 const apiUrl = "https://api.telegram.org/bot{{token}}/{{method_name}}"
@@ -27,9 +25,8 @@ func newUrl(token string, method method) string {
 }
 
 type Bot struct {
-	token   string
-	client  *http.Client
-	limiter *rate.Limiter
+	token  string
+	client *http.Client
 }
 
 func NewBot(cli *http.Client, token string) *Bot {
