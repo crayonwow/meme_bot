@@ -12,12 +12,20 @@ import (
 func main() {
 	_token := flag.String("token", "", "telegram bot token")
 	_chatID := flag.String("chat_id", "", "telegram chat id")
+
 	_url := flag.String("url", "", "instagram url")
+	_isSilent := flag.Bool("silent", false, "is silent")
+	_hasSpoiler := flag.Bool("spoiler", false, "is spoiler")
+	_message := flag.String("message", "", "message")
 	flag.Parse()
 
 	token := *_token
 	chatID := *_chatID
+
 	url := *_url
+	isSilent := *_isSilent
+	hasSpoiler := *_hasSpoiler
+	message := *_message
 
 	slog.Info("starting app", "token", token, "chatID", chatID)
 
@@ -39,7 +47,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = b.UploadVideo(ctx, chatID, video)
+	err = b.UploadVideo(ctx, chatID, message, isSilent, hasSpoiler, video)
 	if err != nil {
 		slog.Error("cant upload video", "err", err.Error())
 		os.Exit(1)

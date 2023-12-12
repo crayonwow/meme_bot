@@ -36,7 +36,12 @@ func NewBot(token string) *Bot {
 	}
 }
 
-func (b *Bot) UploadVideo(ctx context.Context, chatID string, videoFile io.Reader) error {
+func (b *Bot) UploadVideo(
+	ctx context.Context,
+	chatID, message string,
+	isSilent, hasSpoiler bool,
+	videoFile io.Reader,
+) error {
 	r, w := io.Pipe()
 	m := multipart.NewWriter(w)
 
@@ -48,7 +53,18 @@ func (b *Bot) UploadVideo(ctx context.Context, chatID string, videoFile io.Reade
 			w.CloseWithError(err)
 			return
 		}
-
+		if err := m.WriteField("caption", message); err != nil {
+			w.CloseWithError(err)
+			return
+		}
+		if err := m.WriteField("disable_notification", fmt.Sprintf("%t", isSilent)); err != nil {
+			w.CloseWithError(err)
+			return
+		}
+		if err := m.WriteField("has_spoiler", fmt.Sprintf("%t", hasSpoiler)); err != nil {
+			w.CloseWithError(err)
+			return
+		}
 		part, err := m.CreateFormFile("video", "video.mp4")
 		if err != nil {
 			w.CloseWithError(err)

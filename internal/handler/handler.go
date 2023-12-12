@@ -56,7 +56,8 @@ func (h *Handler) do(ctx context.Context, _url string) error {
 		return fmt.Errorf("cant download video: %w", err)
 	}
 
-	err = h.b.UploadVideo(ctx, h.chatID, video)
+	// todo change
+	err = h.b.UploadVideo(ctx, h.chatID, "", false, false, video)
 	if err != nil {
 		return fmt.Errorf("cant upload video: %w", err)
 	}
