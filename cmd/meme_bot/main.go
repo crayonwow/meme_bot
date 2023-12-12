@@ -4,6 +4,8 @@ import (
 	"log/slog"
 	"meme_bot/internal/bot"
 	"meme_bot/internal/handler"
+	"meme_bot/pkg"
+	"meme_bot/pkg/instagram"
 	"net"
 	"net/http"
 	"os"
@@ -28,8 +30,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	b := bot.NewBot(token)
-	h := handler.NewHandler(chatID, b)
+	client := pkg.NewHttpClient()
+	insta := instagram.NewClient(client)
+
+	b := bot.NewBot(client, token)
+	h := handler.NewHandler(insta, chatID, b)
 
 	router := http.NewServeMux()
 	router.HandleFunc("/webhook", h.HandleMessage)

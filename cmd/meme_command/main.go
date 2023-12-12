@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log/slog"
 	"meme_bot/internal/bot"
+	"meme_bot/pkg"
 	"meme_bot/pkg/instagram"
 	"os"
 )
@@ -38,10 +39,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	b := bot.NewBot(token)
+	client := pkg.NewHttpClient()
+	insta := instagram.NewClient(client)
+
+	b := bot.NewBot(client, token)
 
 	ctx := context.Background()
-	video, err := instagram.DownloadVideo(ctx, url)
+	video, err := insta.DownloadVideo(ctx, url)
 	if err != nil {
 		slog.Error("cant download video", "err", err.Error())
 		os.Exit(1)

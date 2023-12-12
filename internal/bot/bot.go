@@ -29,10 +29,10 @@ type Bot struct {
 	client *http.Client
 }
 
-func NewBot(token string) *Bot {
+func NewBot(cli *http.Client, token string) *Bot {
 	return &Bot{
 		token:  token,
-		client: &http.Client{},
+		client: cli,
 	}
 }
 
