@@ -8,6 +8,7 @@ import (
 	"meme_bot/pkg"
 	"meme_bot/pkg/instagram"
 	"os"
+	"time"
 )
 
 func main() {
@@ -42,7 +43,7 @@ func main() {
 	client := pkg.NewHttpClient()
 	insta := instagram.NewClient(client)
 
-	b := bot.NewBot(client, token)
+	b := bot.NewBot(client, token, time.Minute)
 
 	ctx := context.Background()
 	video, err := insta.DownloadVideo(ctx, url)

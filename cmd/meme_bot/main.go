@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 	client := pkg.NewHttpClient()
 	insta := instagram.NewClient(client)
 
-	b := bot.NewBot(client, token)
+	b := bot.NewBot(client, token, time.Minute)
 	h := handler.NewHandler(insta, chatID, b)
 
 	router := http.NewServeMux()
