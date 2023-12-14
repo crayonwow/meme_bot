@@ -36,7 +36,8 @@ func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
 	message := &Message{}
 	err = json.Unmarshal(b, message)
 	if err != nil {
-		http.Error(w, "cant decode payload", http.StatusBadRequest)
+		slog.Error("cant decode payload", "error", err.Error(), "payload", string(b))
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 	slog.Info("message", "message", string(b))
@@ -44,7 +45,8 @@ func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
 	text := message.Message.Text
 	splits := strings.Split(text, "\n")
 	if len(splits) != 4 {
-		http.Error(w, "bad message", http.StatusBadRequest)
+		slog.Error("cant parse message", "splits", splits)
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
@@ -55,7 +57,8 @@ func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
 
 	_, err = url.Parse(_url)
 	if err != nil {
-		http.Error(w, "cant parse url", http.StatusBadRequest)
+		slog.Error("cant parse url", "url", _url)
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 	h.asyncDo(_url, _message, _isSilent, _hasSpoiler)
