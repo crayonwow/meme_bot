@@ -10,24 +10,42 @@ import (
 	"meme_bot/pkg/instagram"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 )
 
-func NewHandler(client *instagram.Client, chatID string, b *bot.Bot) *Handler {
+func NewHandler(
+	client *instagram.Client,
+	chatID string,
+	b *bot.Bot,
+	secretToken string,
+	userWhiteList []string,
+) *Handler {
 	return &Handler{
-		b:      b,
-		chatID: chatID,
-		insta:  client,
+		b:             b,
+		chatID:        chatID,
+		insta:         client,
+		secretToken:   secretToken,
+		userWhiteList: userWhiteList,
 	}
 }
 
 type Handler struct {
-	b      *bot.Bot
-	chatID string
-	insta  *instagram.Client
+	b             *bot.Bot
+	chatID        string
+	insta         *instagram.Client
+	secretToken   string
+	userWhiteList []string
 }
 
 func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("X-Telegram-Bot-Api-Secret-Token")
+	if token != h.secretToken {
+		slog.Error("invalid token", "token", token)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "cant read body", http.StatusInternalServerError)
@@ -40,7 +58,11 @@ func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	slog.Info("message", "message", string(b))
+	slog.Info("message", "message", message, "payload", string(b))
+	if !slices.Contains(h.userWhiteList, message.Message.Chat.Username) {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	text := message.Message.Text
 	splits := strings.Split(text, "\n")
