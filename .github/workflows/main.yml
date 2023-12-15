@@ -64,5 +64,7 @@ jobs:
               -e TOKEN=${{ secrets.BOT_TOKEN }} \
               -e PORT=${{ secrets.BOT_PORT }} \
               -e CHAT_ID=${{ secrets.CHAT_ID }} \
+              -e SECRET_TOKEN=${{ secrets.SECRET_TOKEN }} \
+              -e USER_WHITE_LIST=${{ secrets.USER_WHITE_LIST }} \
               --network=nginx_net \
               ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -16,6 +17,9 @@ func main() {
 	port := os.Getenv("PORT")
 	token := os.Getenv("TOKEN")
 	chatID := os.Getenv("CHAT_ID")
+	secretToken := os.Getenv("SECRET_TOKEN")
+	userWhiteListRaw := os.Getenv("USER_WHITE_LIST")
+
 	slog.Info("starting app", "port", port, "token", token, "chatID", chatID)
 
 	if token == "" {
@@ -31,11 +35,21 @@ func main() {
 		os.Exit(1)
 	}
 
+	if secretToken == "" {
+		slog.Error("SECRET_TOKEN is empty")
+		os.Exit(1)
+	}
+
+	if userWhiteListRaw == "" || len(strings.Split(userWhiteListRaw, ",")) == 0 {
+		slog.Error("WHITE_LIST is empty")
+		os.Exit(1)
+	}
+
 	client := pkg.NewHttpClient()
 	insta := instagram.NewClient(client)
 
 	b := bot.NewBot(client, token, time.Minute)
-	h := handler.NewHandler(insta, chatID, b)
+	h := handler.NewHandler(insta, chatID, b, secretToken, strings.Split(userWhiteListRaw, ","))
 
 	router := http.NewServeMux()
 	router.HandleFunc("/webhook", h.HandleMessage)
