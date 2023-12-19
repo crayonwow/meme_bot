@@ -9,7 +9,6 @@ import (
 	"meme_bot/internal/bot"
 	"meme_bot/pkg/instagram"
 	"net/http"
-	"net/url"
 	"slices"
 	"strings"
 )
@@ -64,25 +63,22 @@ func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	text := message.Message.Text
-	splits := strings.Split(text, "\n")
-	if len(splits) != 4 {
-		slog.Error("cant parse message", "splits", splits)
-		w.WriteHeader(http.StatusOK)
-		return
+	var (
+		_url, _message         string
+		_isSilent, _hasSpoiler bool
+	)
+
+	setters := []func(string){
+		func(s string) { _url = s },
+		func(s string) { _message = s },
+		func(s string) { _isSilent = s == "1" },
+		func(s string) { _hasSpoiler = s == "1" },
 	}
 
-	_url := splits[0]
-	_message := splits[1]
-	_isSilent := splits[2] == "1"
-	_hasSpoiler := splits[3] == "1"
-
-	_, err = url.Parse(_url)
-	if err != nil {
-		slog.Error("cant parse url", "url", _url)
-		w.WriteHeader(http.StatusOK)
-		return
+	for i, s := range strings.Split(message.Message.Text, "\n") {
+		setters[i](s)
 	}
+
 	h.asyncDo(_url, _message, _isSilent, _hasSpoiler)
 	slog.Info("success", "url", _url)
 
