@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"meme_bot/internal/bot"
-	"meme_bot/pkg/instagram"
 	"net/http"
 	"slices"
 	"strings"
+
+	"meme_bot/internal/bot"
+	"meme_bot/pkg/instagram"
 )
 
 func NewHandler(

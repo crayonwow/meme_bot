@@ -10,4 +10,5 @@ RUN chmod +x /build/bot
 #####################
 FROM scratch
 COPY --from=builder /build/bot /usr/bin/bot
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 CMD ["/usr/bin/bot"]
