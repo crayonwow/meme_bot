@@ -69,15 +69,23 @@ func (h *Handler) HandleMessage(w http.ResponseWriter, r *http.Request) {
 		_isSilent, _hasSpoiler bool
 	)
 
-	setters := []func(string){
-		func(s string) { _url = s },
-		func(s string) { _message = s },
-		func(s string) { _isSilent = s == "1" },
-		func(s string) { _hasSpoiler = s == "1" },
-	}
+	split := strings.Split(message.Message.Text, "\n")
 
-	for i, s := range strings.Split(message.Message.Text, "\n") {
-		setters[i](s)
+	_url = split[0]
+	if len(split) == 2 {
+		_message = split[1]
+	}
+	if l := len(_message); l != 0 {
+		shift := 0
+		if _isSilent = _message[0] == '.'; _isSilent {
+			shift++
+		}
+		if l > 1 {
+			if _hasSpoiler = _message[1] == '.'; _hasSpoiler {
+				shift++
+			}
+		}
+		_message = _message[shift:]
 	}
 
 	h.asyncDo(_url, _message, _isSilent, _hasSpoiler)
