@@ -4,14 +4,15 @@ COPY . /build
 ENV CGO_ENABLED=0  \
   GOCACHE=/.cache/go-build
 
-RUN --mount=type=cache,target=/.cache/go-build go build -o ./bot -buildvcs=false -trimpath -ldflags "-s -w" cmd/meme_bot/main.go
-RUN chmod +x /build/bot
+RUN --mount=type=cache,target=/.cache/go-build go build -o ./service -buildvcs=false -trimpath -ldflags "-s -w" cmd/meme_bot/main.go
+RUN chmod +x /build/service
 #####################
-FROM linuxserver/ffmpeg:latest AS ffmpeg
 #####################
-FROM scratch
-COPY --from=builder /build/bot /usr/bin/bot
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=ffmpeg /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
+FROM alpine:3.19
+RUN apk update
+RUN apk upgrade
+RUN apk add --no-cache ffmpeg
 
-CMD ["/usr/bin/bot"]
+COPY --from=builder /build/service /usr/bin/service
+
+CMD ["/usr/bin/service"]
