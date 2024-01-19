@@ -7,8 +7,11 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
 	"slices"
 	"strings"
+
+	ffmpeg "github.com/u2takey/ffmpeg-go"
 
 	"meme_bot/internal/bot"
 	"meme_bot/pkg/instagram"
@@ -99,12 +102,49 @@ func (h *Handler) do(
 	_url, _message string,
 	_isSilent, _hasSpoiler bool,
 ) error {
-	video, err := h.insta.DownloadVideo(ctx, _url)
+	rawVideo, err := h.insta.DownloadVideo(ctx, _url)
 	if err != nil {
 		return fmt.Errorf("cant download video: %w", err)
 	}
 
-	err = h.b.UploadVideo(ctx, h.chatID, _message, _isSilent, _hasSpoiler, video)
+	const tmpInput = "tmp_in.mp4"
+	const tmpOutput = "tmp_out.mp4"
+
+	f, err := os.Create(tmpInput)
+	if err != nil {
+		return fmt.Errorf("create: %w", err)
+	}
+	defer f.Close()
+	_, err = io.Copy(f, rawVideo)
+	if err != nil {
+		return fmt.Errorf("copy: %w", err)
+	}
+
+	stream := ffmpeg.Input(tmpInput)
+
+	err = stream.
+		Drawtext(
+			"@bruh_memento",
+			10,
+			10,
+			false,
+			ffmpeg.KwArgs{"fontcolor": "red"},
+		).
+		Output(tmpOutput, ffmpeg.KwArgs{"map": "0:a:?"}).
+		ErrorToStdOut().
+		OverWriteOutput().
+		Run()
+	if err != nil {
+		return fmt.Errorf("ffmpeg process: %w", err)
+	}
+
+	processedVideo, err := os.Open(tmpOutput)
+	if err != nil {
+		return fmt.Errorf("open: %w", err)
+	}
+	defer processedVideo.Close()
+
+	err = h.b.UploadVideo(ctx, h.chatID, _message, _isSilent, _hasSpoiler, processedVideo)
 	if err != nil {
 		return fmt.Errorf("cant upload video: %w", err)
 	}
