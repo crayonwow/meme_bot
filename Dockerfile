@@ -12,6 +12,7 @@ FROM alpine:3.19
 RUN apk update
 RUN apk upgrade
 RUN apk add --no-cache ffmpeg
+RUN apk add font-terminus
 
 COPY --from=builder /build/service /usr/bin/service
 
