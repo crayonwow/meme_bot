@@ -125,10 +125,10 @@ func (h *Handler) do(
 	err = stream.
 		Drawtext(
 			"@bruh_memento",
-			10,
-			10,
+			50,
+			50,
 			false,
-			ffmpeg.KwArgs{"fontcolor": "red"},
+			// ffmpeg.KwArgs{"fontcolor": "red"},
 		).
 		Output(tmpOutput, ffmpeg.KwArgs{"map": "0:a:?"}).
 		ErrorToStdOut().
