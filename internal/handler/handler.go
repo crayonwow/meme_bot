@@ -133,7 +133,7 @@ func (h *Handler) do(
 		Output(tmpOutput, ffmpeg.KwArgs{"map": "0:a:?"}).
 		ErrorToStdOut().
 		OverWriteOutput().
-		Run()
+		RunWithResource(0.1, 0.5)
 	if err != nil {
 		return fmt.Errorf("ffmpeg process: %w", err)
 	}
