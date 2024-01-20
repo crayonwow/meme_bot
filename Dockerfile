@@ -9,7 +9,7 @@ RUN chmod +x /build/service
 
 #####################
 FROM ubuntu:22.04
-RUN apt-get update && apt-get install ffmpeg -y
+RUN apt-get update && apt-get install ffmpeg ca-certificates -y && update-ca-certificates
 # RUN apk add --no-cache ffmpeg font-terminus font-inconsolata font-dejavu font-noto font-noto-cjk font-awesome font-noto-extra
 
 COPY --from=builder /build/service /usr/bin/service
