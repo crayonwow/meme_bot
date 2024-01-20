@@ -8,7 +8,10 @@ RUN --mount=type=cache,target=/.cache/go-build go build -o ./service -buildvcs=f
 RUN chmod +x /build/service
 
 #####################
-FROM linuxserver/ffmpeg 
+FROM alpine:3.19
+RUN apk update
+RUN apk upgrade
+RUN apk add --no-cache ffmpeg font-terminus font-inconsolata font-dejavu font-noto font-noto-cjk font-awesome font-noto-extra
 
 COPY --from=builder /build/service /usr/bin/service
 
